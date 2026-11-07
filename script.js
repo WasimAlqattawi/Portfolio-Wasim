@@ -4,10 +4,12 @@ const themeIcon = themeToggle?.querySelector('i');
 const navLinks = document.querySelectorAll('.side-nav a[href^="#"]');
 const sections = document.querySelectorAll('main section[id]');
 const contactForm = document.querySelector('.contact-form');
+
 const animatedItems = document.querySelectorAll(
     'section, .profile-card, .service-card, .about-card article, .timeline-item'
 );
 
+// استعادة المظهر المحفوظ
 const savedTheme = localStorage.getItem('portfolio-theme');
 
 if (savedTheme === 'dark') {
@@ -16,6 +18,7 @@ if (savedTheme === 'dark') {
 
 updateThemeIcon();
 
+// زر الوضع الليلي
 themeToggle?.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
 
@@ -32,6 +35,7 @@ function updateThemeIcon() {
     themeIcon?.classList.toggle('fa-sun', !isDark);
 }
 
+// التنقل بين أقسام الصفحة
 navLinks.forEach((link) => {
     link.addEventListener('click', (event) => {
         const targetId = link.getAttribute('href');
@@ -40,6 +44,7 @@ navLinks.forEach((link) => {
         if (!targetSection) return;
 
         event.preventDefault();
+
         targetSection.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
@@ -47,6 +52,7 @@ navLinks.forEach((link) => {
     });
 });
 
+// تحديث الرابط النشط حسب القسم الظاهر
 const activeSectionObserver = new IntersectionObserver(
     (entries) => {
         entries.forEach((entry) => {
@@ -66,8 +72,11 @@ const activeSectionObserver = new IntersectionObserver(
     }
 );
 
-sections.forEach((section) => activeSectionObserver.observe(section));
+sections.forEach((section) => {
+    activeSectionObserver.observe(section);
+});
 
+// إظهار العناصر عند الوصول إليها أثناء التمرير
 const revealObserver = new IntersectionObserver(
     (entries, observer) => {
         entries.forEach((entry) => {
@@ -88,22 +97,29 @@ animatedItems.forEach((item, index) => {
     revealObserver.observe(item);
 });
 
+// إرسال نموذج التواصل عبر تطبيق البريد
 contactForm?.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    const name = contactForm.elements.name?.value.trim();
-    const email = contactForm.elements.email?.value.trim();
-    const message = contactForm.elements.message?.value.trim();
+    const name = contactForm.elements.name.value.trim();
+    const email = contactForm.elements.email.value.trim();
+    const message = contactForm.elements.message.value.trim();
 
     if (!name || !email || !message) {
         showToast('Please fill in all fields.');
         return;
     }
 
-    showToast('Message ready. Thanks for reaching out!');
-    contactForm.reset();
+    const subject = encodeURIComponent(`Portfolio message from ${name}`);
+    const emailBody = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\n\n${message}`
+    );
+
+    window.location.href =
+        `mailto:waseem16009@gmail.com?subject=${subject}&body=${emailBody}`;
 });
 
+// إظهار رسالة صغيرة على الصفحة
 function showToast(message) {
     const oldToast = document.querySelector('.toast-message');
     oldToast?.remove();
@@ -113,11 +129,16 @@ function showToast(message) {
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    requestAnimationFrame(() => toast.classList.add('show'));
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
 
     setTimeout(() => {
         toast.classList.remove('show');
-        toast.addEventListener('transitionend', () => toast.remove(), {
+
+        toast.addEventListener('transitionend', () => {
+            toast.remove();
+        }, {
             once: true
         });
     }, 2600);
