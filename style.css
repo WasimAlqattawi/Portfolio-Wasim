@@ -88,6 +88,31 @@ body.dark-mode .contact-item {
     border-color: #2d3748;
 }
 
+/* القائمة الجانبية في الوضع الليلي */
+body.dark-mode .side-nav {
+    background: var(--white);
+}
+
+/* إرجاع اللون الأزرق للعنصر النشط وعند المرور */
+body.dark-mode .side-nav a:hover,
+body.dark-mode .side-nav a.active,
+body.dark-mode .social-links a:hover {
+    background: var(--blue);
+    color: white;
+}
+
+/* حقول الفورم في الوضع الليلي */
+body.dark-mode .contact-form input,
+body.dark-mode .contact-form textarea {
+    background: #1b2330;
+    color: var(--text-color);
+}
+
+body.dark-mode .contact-form input::placeholder,
+body.dark-mode .contact-form textarea::placeholder {
+    color: var(--text-light);
+}
+
 .page {
     position: fixed;
     inset: 0;
@@ -106,7 +131,7 @@ body.dark-mode .contact-item {
     margin-inline: auto;
 }
 
-body>div:not(.page) {
+body>div:not(.page):not(.toast-message) {
     display: contents;
 }
 
@@ -169,7 +194,6 @@ section {
 /* =========================
    SIDEBAR
 ========================= */
-.info-bar,
 .profile-card {
     position: sticky;
     top: 2rem;
@@ -211,12 +235,13 @@ section {
     text-align: center;
 }
 
-.profile-head h1 {
+.profile-name {
     font-size: 1.55rem;
+    font-weight: 600;
     margin-bottom: .5rem;
 }
 
-.profile-head p {
+.profile-role {
     color: var(--text-light);
     font-size: .9rem;
 }
@@ -400,11 +425,6 @@ section {
     gap: 1.5rem;
 }
 
-.about .service-card,
-.about-card {
-    display: grid;
-}
-
 
 /* البطاقة */
 .service-card article,
@@ -430,6 +450,7 @@ section {
 
 .service-card i,
 .about-card i {
+    display: block;/
     font-size: 1.5rem;
     color: var(--blue);
     margin-bottom: 1rem;
@@ -467,8 +488,24 @@ section {
     transition: var(--transition);
 }
 
-.services .service-card:hover {
+.services .service-card article {
+    padding: 1.5rem;
+    border-radius: 8px;
+    transition: transform var(--transition);
+}
+
+.services .service-card article:hover {
     transform: translateY(-5px);
+}
+
+.services .service-card article:nth-child(4n + 1),
+.services .service-card article:nth-child(4n + 4) {
+    background: var(--blue-light);
+}
+
+.services .service-card article:nth-child(4n + 2),
+.services .service-card article:nth-child(4n + 3) {
+    background: var(--pink-light);
 }
 
 .service-title {
@@ -521,25 +558,75 @@ section {
     font-size: 1.1rem;
 }
 
-
 /* =========================
    WORKS
 ========================= */
-.works-content {
-    min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.work-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    transition: transform var(--transition);
+}
+
+.work-card:hover {
+    transform: translateY(-5px);
+}
+
+.work-card.blue {
     background: var(--blue-light);
-    border-radius: 20px;
-    padding: 2rem;
 }
 
-.works-text {
+.work-card.pink {
+    background: var(--pink-light);
+}
+
+.work-title {
+    font-size: 1.2rem;
+    margin-bottom: .8rem;
+}
+
+.work-text {
     color: var(--text-light);
-    font-size: 1.1rem;
+    line-height: 1.9;
+    margin-bottom: 1rem;
 }
 
+.work-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.work-tags span {
+    font-size: .75rem;
+    font-weight: 500;
+    padding: .25rem .7rem;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--blue);
+}
+
+.work-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.work-links a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: .9rem;
+}
+
+.work-links a:hover {
+    text-decoration: underline;
+}
 
 /* =========================
    CONTACT
@@ -579,6 +666,7 @@ section {
 .contact-form button {
     width: fit-content;
     border: none;
+    font-family: inherit;
     background: var(--blue);
     color: white;
     padding: 1rem 1.5rem;
@@ -651,6 +739,12 @@ section {
     font-weight: 600;
 }
 
+/* مؤشر التركيز عند التنقل بلوحة المفاتيح */
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+}
 
 /* =========================
    THEME BUTTON
@@ -748,14 +842,12 @@ body.dark-mode .toast-message {
     }
 
     section,
-    .info-bar,
     .profile-card,
     .side-header,
     .side-nav {
         grid-column: 1;
     }
 
-    .info-bar,
     .profile-card {
         position: relative;
         top: 0;
@@ -792,8 +884,17 @@ body.dark-mode .toast-message {
     .service-card,
     .about-card,
     .services-list,
-    .resume-content {
+    .resume-content,
+    .works-grid {
         grid-template-columns: 1fr;
+    }
+
+    .services .service-card article:nth-child(odd) {
+        background: var(--blue-light);
+    }
+
+    .services .service-card article:nth-child(even) {
+        background: var(--pink-light);
     }
 
     .home-title {
@@ -815,7 +916,6 @@ body.dark-mode .toast-message {
         top: -62px;
     }
 
-    .info-bar,
     .profile-card {
         padding-top: 4.5rem;
     }

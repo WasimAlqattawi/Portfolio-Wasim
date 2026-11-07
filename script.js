@@ -9,10 +9,18 @@ const animatedItems = document.querySelectorAll(
     'section, .profile-card, .service-card, .about-card article, .timeline-item'
 );
 
-// استعادة المظهر المحفوظ
-const savedTheme = localStorage.getItem('portfolio-theme');
+// استعادة المظهر المحفوظ (أو اتباع نظام الجهاز في أول زيارة)
+let savedTheme = null;
 
-if (savedTheme === 'dark') {
+try {
+    savedTheme = localStorage.getItem('portfolio-theme');
+} catch (error) {
+    // التخزين غير متاح (وضع خاص مثلاً)، نكمل بدونه
+}
+
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
     body.classList.add('dark-mode');
 }
 
@@ -23,8 +31,11 @@ themeToggle?.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
 
     const isDark = body.classList.contains('dark-mode');
-    localStorage.setItem('portfolio-theme', isDark ? 'dark' : 'light');
-
+    try {
+        localStorage.setItem('portfolio-theme', isDark ? 'dark' : 'light');
+    } catch (error) {
+        // نتجاهل الخطأ
+    }
     updateThemeIcon();
 });
 
@@ -76,14 +87,20 @@ sections.forEach((section) => {
     activeSectionObserver.observe(section);
 });
 
-// إظهار العناصر عند الوصول إليها أثناء التمرير
 const revealObserver = new IntersectionObserver(
     (entries, observer) => {
         entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
 
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
+            const el = entry.target;
+            el.classList.add('is-visible');
+            observer.unobserve(el);
+
+            // بعد انتهاء حركة الظهور ننظف العنصر
+            setTimeout(() => {
+                el.classList.remove('reveal', 'is-visible');
+                el.style.transitionDelay = '';
+            }, 1000);
         });
     },
     {
@@ -96,9 +113,8 @@ animatedItems.forEach((item, index) => {
     item.style.transitionDelay = `${Math.min(index * 45, 260)}ms`;
     revealObserver.observe(item);
 });
-
-// إرسال نموذج التواصل عبر تطبيق البريد
-contactForm?.addEventListener('submit', (event) => {
+// إرسال نموذج التواصل عبر Web3Forms
+contactForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const name = contactForm.elements.name.value.trim();
@@ -110,13 +126,40 @@ contactForm?.addEventListener('submit', (event) => {
         return;
     }
 
-    const subject = encodeURIComponent(`Portfolio message from ${name}`);
-    const emailBody = encodeURIComponent(
-        `Name: ${name}\nEmail: ${email}\n\n${message}`
-    );
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
 
-    window.location.href =
-        `mailto:waseem16009@gmail.com?subject=${subject}&body=${emailBody}`;
+    try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                access_key: 'db383ecb-d0fa-4185-928b-938a2f12075b',
+                subject: `Portfolio message from ${name}`,
+                name,
+                email,
+                message
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Message sent! Thank you.');
+            contactForm.reset();
+        } else {
+            showToast('Something went wrong. Please try again.');
+        }
+    } catch (error) {
+        showToast('Network error. Please try again later.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Message';
+    }
 });
 
 // إظهار رسالة صغيرة على الصفحة
@@ -126,6 +169,8 @@ function showToast(message) {
 
     const toast = document.createElement('div');
     toast.className = 'toast-message';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.textContent = message;
     document.body.appendChild(toast);
 
