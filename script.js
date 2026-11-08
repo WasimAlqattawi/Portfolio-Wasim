@@ -6,7 +6,7 @@ const sections = document.querySelectorAll('main section[id]');
 const contactForm = document.querySelector('.contact-form');
 
 const animatedItems = document.querySelectorAll(
-    'section, .profile-card, .service-card, .about-card article, .timeline-item'
+    '.section-title, .about-text, .about-card article, .services .service-card article, .timeline-item, .work-card, .contact-form'
 );
 
 // استعادة المظهر المحفوظ (أو اتباع نظام الجهاز في أول زيارة)

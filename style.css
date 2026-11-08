@@ -11,6 +11,9 @@
 
     --radius: 10px;
     --transition: .3s ease;
+    --sticky-top: 7rem;
+    --bottom-gap: 1.5rem;
+    --panel-height: calc(100vh - var(--sticky-top) - var(--bottom-gap));
 }
 
 * {
@@ -43,7 +46,7 @@ body {
     gap: 2rem;
     justify-content: center;
     align-items: start;
-    padding: 10rem 1rem 4rem;
+    padding: 10rem 1rem var(--bottom-gap);
 }
 
 body.dark-mode {
@@ -196,7 +199,7 @@ section {
 ========================= */
 .profile-card {
     position: sticky;
-    top: 2rem;
+    top: var(--sticky-top);
     grid-column: 1;
     background: var(--white);
     border-radius: var(--radius);
@@ -207,6 +210,8 @@ section {
     align-items: center;
     gap: 1.5rem;
     width: 100%;
+    min-height: var(--panel-height);
+    justify-content: space-between;
 }
 
 
@@ -679,13 +684,12 @@ section {
     transform: translateY(-4px);
 }
 
-
 /* =========================
    SIDE NAV
 ========================= */
 .side-header {
     position: sticky;
-    top: 2rem;
+    top: var(--sticky-top);
     grid-column: 3;
     width: 100%;
     align-self: start;
@@ -700,9 +704,11 @@ section {
     padding: 1.5rem .75rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.1rem;
     align-items: center;
+    justify-content: center;
     box-shadow: var(--shadow);
+    min-height: var(--panel-height);
 }
 
 
@@ -732,7 +738,7 @@ section {
 }
 
 
-/* إخفاء النص */
+/* النص تحت الأيقونة */
 .side-nav span {
     display: block;
     font-size: .75rem;
@@ -745,6 +751,7 @@ button:focus-visible {
     outline: 3px solid var(--blue);
     outline-offset: 3px;
 }
+
 
 /* =========================
    THEME BUTTON
@@ -839,6 +846,7 @@ body.dark-mode .toast-message {
 
     .page-shell {
         padding-top: 0;
+        margin-bottom: 0;
     }
 
     section,
@@ -852,6 +860,8 @@ body.dark-mode .toast-message {
         position: relative;
         top: 0;
         margin-top: 4.5rem;
+        margin-bottom: 1.5rem;
+        min-height: 0;
     }
 
     .side-header {
@@ -867,6 +877,7 @@ body.dark-mode .toast-message {
         z-index: 1000;
         width: min(calc(100% - 2rem), 560px);
         justify-content: center;
+        min-height: 0;
     }
 }
 
@@ -875,10 +886,6 @@ body.dark-mode .toast-message {
 @media (max-width: 768px) {
     section {
         padding: 1.5rem;
-    }
-
-    .page-shell {
-        gap: 1.25rem;
     }
 
     .service-card,
@@ -918,6 +925,7 @@ body.dark-mode .toast-message {
 
     .profile-card {
         padding-top: 4.5rem;
+        margin-bottom: 1.25rem;
     }
 
     .side-nav {
